@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerControl : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class PlayerControl : MonoBehaviour
 
     
     private bool _isMoving;
+    private bool _isOnSlippery;
     private int _doubleJump;
     private Vector2 _initialPosition;
 
@@ -32,6 +34,7 @@ public class PlayerControl : MonoBehaviour
         horizontal= 0;
 
         _isMoving = false;
+        _isOnSlippery = false;
 
         _playerInput = new PlayerInput();
         _rb = GetComponent<Rigidbody2D>();
@@ -47,13 +50,23 @@ public class PlayerControl : MonoBehaviour
             _isMoving = true;
 
         }
+
+
+        if (_playerInput.Player.Restart.triggered)
+        {
+            RestartLevel();
+        }
+
+
+
+
     }
 
     void FixedUpdate()
     {
 
 
-        if (_isMoving)
+        if (_isMoving && !_isOnSlippery)
         {
             var velocityX = _speed * horizontal;
             _rb.velocity = new Vector2(velocityX, _rb.velocity.y);
@@ -75,7 +88,8 @@ public class PlayerControl : MonoBehaviour
     {
         //ResetLevel();
         //animation
-        transform.position = _initialPosition;
+        //transform.position = _initialPosition;
+        RestartLevel();
     }
 
 
@@ -120,8 +134,6 @@ public class PlayerControl : MonoBehaviour
     }
 
 
-
-
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if(Physics2D.Raycast(transform.position, Vector2.down, 1.5f,
@@ -129,6 +141,26 @@ public class PlayerControl : MonoBehaviour
         {
             _doubleJump = 2;
         }
+
+        if(collision.gameObject.tag == "Slippery")
+        {
+            _isOnSlippery = true;
+        }
+    }
+
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Slippery")
+        {
+            _isOnSlippery = false;
+        }
+    }
+
+
+    public void RestartLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
 }
