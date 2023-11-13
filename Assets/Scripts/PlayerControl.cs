@@ -8,14 +8,23 @@ public class PlayerControl : MonoBehaviour
     private Rigidbody2D _rb;
     private PlayerInput _playerInput;
 
-    
+    private float _fallingSpeed;
+    private float _fallDamage;
+    private float _rayCastDistance;
+    private float _rayCastDownDistance;
+
+
     private bool _isMoving;
     private bool _isOnSlippery;
+    private bool _isOnBelt;
     private int _doubleJump;
     private Vector2 _initialPosition;
 
+
+
+
     [SerializeField]
-    private float _speed;
+    protected float _speed;
     [SerializeField]
     private float _jumpPower;
 
@@ -25,7 +34,7 @@ public class PlayerControl : MonoBehaviour
 
     private void Awake()
     {
-        //Application.targetFrameRate = 60;
+        Application.targetFrameRate = 75;
 
         _doubleJump = 2;
         _speed = 11f;       
@@ -33,8 +42,14 @@ public class PlayerControl : MonoBehaviour
         _initialPosition = new Vector2(-6f, 1f);
         horizontal= 0;
 
+        _rayCastDistance = 0.5f;
+        _rayCastDownDistance = 1.5f;
+        _fallingSpeed = 0;
+        _fallDamage = -40f;
+
         _isMoving = false;
         _isOnSlippery = false;
+        _isOnBelt = false;
 
         _playerInput = new PlayerInput();
         _rb = GetComponent<Rigidbody2D>();
@@ -43,6 +58,12 @@ public class PlayerControl : MonoBehaviour
 
     private void Update()
     {
+        if(_rb.velocity.y < _fallingSpeed)
+        {
+            _fallingSpeed = _rb.velocity.y;
+        }
+
+
         horizontal = Mathf.RoundToInt(_playerInput.Player.Move.ReadValue<Vector2>().x);
 
         if (!IsOnWall(horizontal))
@@ -65,15 +86,26 @@ public class PlayerControl : MonoBehaviour
     void FixedUpdate()
     {
 
-
-        if (_isMoving && !_isOnSlippery)
+        //player movement (normal)
+        if (_isMoving && !_isOnSlippery && !_isOnBelt)
         {
             var velocityX = _speed * horizontal;
             _rb.velocity = new Vector2(velocityX, _rb.velocity.y);
             _isMoving = false;
         }
 
-        
+
+        //moving on special surface
+        if (_isMoving && (_isOnSlippery || _isOnBelt))
+        {
+            var velocityX = _speed/4 * horizontal;
+            _rb.velocity = new Vector2(_rb.velocity.x + velocityX, _rb.velocity.y);
+            _isMoving = false;
+        }
+
+
+
+        //jump
         if (_playerInput.Player.Jump.triggered && _doubleJump > 0)
         {
             var vertical = Mathf.RoundToInt(_playerInput.Player.Jump.ReadValue<float>());
@@ -104,13 +136,6 @@ public class PlayerControl : MonoBehaviour
     }
 
 
-    private bool IsGrounded()
-    {
-
-
-        return true;
-    }
-
 
     private bool IsOnWall(int horizontal)
     {
@@ -118,9 +143,9 @@ public class PlayerControl : MonoBehaviour
         if (horizontal != 0)
         {
             RaycastHit2D hit = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y - 0.5f),
-                    new Vector2(horizontal, 0), 0.5f, LayerMask.GetMask("Obstacle"));
+                    new Vector2(horizontal, 0), _rayCastDistance, LayerMask.GetMask("Obstacle"));
             RaycastHit2D hit2 = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y - 0.5f),
-                    new Vector2(horizontal, 0), 0.5f, LayerMask.GetMask("Ground"));
+                    new Vector2(horizontal, 0), _rayCastDistance, LayerMask.GetMask("Ground"));
 
             /*Debug.DrawRay(new Vector2(transform.position.x, transform.position.y - 0.5f),
                     new Vector2(horizontal, 0), Color.black);*/
@@ -136,16 +161,44 @@ public class PlayerControl : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(Physics2D.Raycast(transform.position, Vector2.down, 1.5f,
+        if(Physics2D.Raycast(transform.position, Vector2.down, _rayCastDownDistance,
                     LayerMask.GetMask("Ground")).transform != null)
         {
             _doubleJump = 2;
+
+            
+            if (_fallingSpeed < _fallDamage)
+            {
+                //lose earphones
+                Debug.Log("EARPHONE DROPS");
+                _fallingSpeed = 0;
+            }
         }
 
         if(collision.gameObject.tag == "Slippery")
         {
             _isOnSlippery = true;
+
+            if (_fallingSpeed < _fallDamage)
+            {
+                //lose earphones
+                Debug.Log("EARPHONE DROPS");
+                _fallingSpeed = 0;
+            }
         }
+
+        if (collision.gameObject.tag == "Belt")
+        {
+            _isOnBelt = true;
+
+            if (_fallingSpeed < _fallDamage)
+            {
+                //lose earphones
+                Debug.Log("EARPHONE DROPS");
+                _fallingSpeed = 0;
+            }
+        }
+
     }
 
 
@@ -154,6 +207,11 @@ public class PlayerControl : MonoBehaviour
         if (collision.gameObject.tag == "Slippery")
         {
             _isOnSlippery = false;
+        }
+
+        if (collision.gameObject.tag == "Belt")
+        {
+            _isOnBelt = false;
         }
     }
 
