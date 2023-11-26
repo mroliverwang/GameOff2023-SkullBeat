@@ -10,8 +10,8 @@ public class PlayerControl : MonoBehaviour
 
     private float _fallingSpeed;
     private float _fallDamage;
-    private float _rayCastDistance;
-    private float _rayCastDownDistance;
+    public float _rayCastDistance;
+    public float _rayCastDownDistance;
 
 
     private bool _isMoving;
@@ -49,7 +49,7 @@ public class PlayerControl : MonoBehaviour
         _initialPosition = new Vector2(-6f, 1f);
         horizontal= 0;
 
-        _rayCastDistance = 0.5f;
+        _rayCastDistance = 1.5f;
         _rayCastDownDistance = 1.5f;
         _fallingSpeed = 0;
         _fallDamage = -40f;

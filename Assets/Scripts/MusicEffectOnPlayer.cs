@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using DG.Tweening;
 
 public class MusicEffectOnPlayer : MonoBehaviour
@@ -63,8 +64,39 @@ public class MusicEffectOnPlayer : MonoBehaviour
         _isScaling = false;
         _ableToScale = true;
 
+
         _freqChannel = 1;
         _minDiff = 0.8f;
+
+        switch (SceneManager.GetActiveScene().name)
+        {
+            case "Level1":
+                _freqChannel = 1;
+                _minDiff = 0.8f;
+                break;
+
+            case "Level2":
+                _freqChannel = 1;
+                _minDiff = 0.8f;
+                break;
+
+            case "Level3":
+                _freqChannel = 1;
+                _minDiff = 0.8f;
+                break;
+
+            case "Level4":
+                _freqChannel = 0;
+                _minDiff = 0.8f;
+                break;
+
+            case "Level5":
+                _freqChannel = 0;
+                _minDiff = 0.8f;
+                break;
+
+        }
+            
 
         _maxJump = 34f;
         _minSpeed = 6f;
@@ -122,7 +154,11 @@ public class MusicEffectOnPlayer : MonoBehaviour
             GetComponent<PlayerControl>()._speed = Mathf.Max(GetComponent<PlayerControl>().initialSpeed * (1 - audiobandbuffer[_freqChannel] * 3.5f ),
                 _minSpeed);
 
-            
+            GetComponent<PlayerControl>()._rayCastDistance = Mathf.Min(GetComponent<PlayerControl>().initialSpeed * (1 + audiobandbuffer[_freqChannel] * 3.5f),
+                7f);
+
+            GetComponent<PlayerControl>()._rayCastDownDistance = Mathf.Min(GetComponent<PlayerControl>().initialSpeed * (1 + audiobandbuffer[_freqChannel] * 3.5f),
+                5f);
         }
     }
 
@@ -190,7 +226,7 @@ public class MusicEffectOnPlayer : MonoBehaviour
         {
             if (freqband[g] > bandBuffer[g] && Mathf.Abs(freqband[g] - bandBuffer[g]) > _minDiff) {
                 bandBuffer[g] = freqband[g];
-                decrease[g] = 0.0005f;
+                decrease[g] = 0.0003f;
                 
             }
             else
@@ -199,7 +235,7 @@ public class MusicEffectOnPlayer : MonoBehaviour
                 {
                     bandBuffer[g] -= decrease[g];
 
-                    decrease[g] *= 1.1f;
+                    decrease[g] *= 1.05f;
                 }
                 //bandBuffer[g] = 0;
             }
