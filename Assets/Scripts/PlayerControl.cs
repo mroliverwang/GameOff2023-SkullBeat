@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class PlayerControl : MonoBehaviour
 {
-    private Rigidbody2D _rb;
+    protected Rigidbody2D _rb;
     private PlayerInput _playerInput;
 
     private float _fallingSpeed;
@@ -24,9 +24,12 @@ public class PlayerControl : MonoBehaviour
 
 
     [SerializeField]
-    protected float _speed;
+    public float _speed;
     [SerializeField]
-    private float _jumpPower;
+    public float _jumpPower;
+
+    public float initialSpeed;
+    public float initialJumpPower;
 
     private int horizontal;
 
@@ -39,6 +42,10 @@ public class PlayerControl : MonoBehaviour
         _doubleJump = 2;
         _speed = 11f;       
         _jumpPower = 24f;
+        initialSpeed = _speed;
+        initialJumpPower = _jumpPower;
+
+
         _initialPosition = new Vector2(-6f, 1f);
         horizontal= 0;
 

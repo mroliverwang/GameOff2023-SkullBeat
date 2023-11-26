@@ -35,12 +35,22 @@ public class MusicEffectOnPlayer : MonoBehaviour
     private bool _ableToScale;
 
     private int _freqChannel;
+    private float _minDiff;
+
+    
+    private float _maxJump;
+    private float _minSpeed;
+
+    private Rigidbody2D _rb;
 
     void Awake()
     {
         _maxSize = 3.4f;
         _minSize = 1f;
+        updateTime = 0.1f;
 
+
+        _initialScale = transform.localScale;
         arraySize = 512;
         clipSamples = new float[arraySize];
         freqband = new float[8];
@@ -52,84 +62,68 @@ public class MusicEffectOnPlayer : MonoBehaviour
 
         _isScaling = false;
         _ableToScale = true;
-        _freqChannel = 0;
 
-        updateTime = 0.1f;
+        _freqChannel = 1;
+        _minDiff = 0.8f;
 
-        _initialScale = transform.localScale;
+        _maxJump = 34f;
+        _minSpeed = 6f;
+
+        _rb = GetComponent<Rigidbody2D>();
     }
 
     void FixedUpdate()
     {
-        /*transform.localScale = new Vector3(1, 1, 1);
-
-        updateTime -= Time.fixedDeltaTime;
-
-        oldRms = rmsValue;
-
-
-        GetMusicData();
-
-
-
-
-        Debug.Log(Mathf.Abs(rmsValue));
-
-        if (Mathf.Abs(oldRms - rmsValue) > 0.05f){
-
-            if (rmsValue < 0.1)
-            {
-                transform.DOScale(_initialScale *= 1 - (rmsValue * 10), 0.5f);
-            }
-            else
-            {
-                transform.DOScale(_initialScale *= 1 + (rmsValue * 10), 0.5f);
-            }           
-        }
-
-            updateTime = 0.1f;
-        //}*/
-
-
-        GetMusicData();
-        MakeFrequencyBands();
-        BandBuffer();
-        CreateAudioBands();
-
         //if( _isScaling &&  _ableToScale)
         //{
-            
-            //_ableToScale = false;
-            transform.DOScale(new Vector3(Mathf.Min(audiobandbuffer[_freqChannel] * 3.5f + 1f, _maxSize),
-            Mathf.Min(audiobandbuffer[_freqChannel] * 4f + 1f, _maxSize), transform.localScale.z), 0.4f)
-                .OnPlay(() =>
+
+        //_ableToScale = false;
+        /*transform.DOScale(new Vector3(Mathf.Min(audiobandbuffer[_freqChannel] * 3.5f + 1f, _maxSize),
+        Mathf.Min(audiobandbuffer[_freqChannel] * 4f + 1f, _maxSize), transform.localScale.z), 0.4f)
+            .OnPlay(() =>
+            {
+                //_ableToScale = false;
+                //_isScaling = false;
+
+
+            })               
+            .OnComplete(() =>
+            {
+                /*
+                transform.DOScale(Vector3.one, 1f)
+                .OnComplete(()=>
                 {
-                    //_ableToScale = false;
-                    //_isScaling = false;
+                    _isScaling = false;
+                    _ableToScale = true;
 
-
-                })               
-                .OnComplete(() =>
-                {
-                    /*
-                    transform.DOScale(Vector3.one, 1f)
-                    .OnComplete(()=>
-                    {
-                        _isScaling = false;
-                        _ableToScale = true;
-
-                    });*/
                 });
+            });*/
+
+        if (audioSource.isPlaying) {
+
+
+            GetMusicData();
+            MakeFrequencyBands();
+            BandBuffer();
+            CreateAudioBands();
+
+
+
+            transform.DOScale(new Vector3(Mathf.Min(audiobandbuffer[_freqChannel] * 3.5f + 1f, _maxSize),
+               Mathf.Min(audiobandbuffer[_freqChannel] * 4f + 1f, _maxSize), transform.localScale.z), 0.2f);
+
+            //change mass, speed, jumpPower
+            _rb.mass = 1 * transform.localScale.x;
+
+            GetComponent<PlayerControl>()._jumpPower = Mathf.Min(GetComponent<PlayerControl>().initialJumpPower * (1 + audiobandbuffer[_freqChannel] * 3.5f ),
+                _maxJump);
+
+
+            GetComponent<PlayerControl>()._speed = Mathf.Max(GetComponent<PlayerControl>().initialSpeed * (1 - audiobandbuffer[_freqChannel] * 3.5f ),
+                _minSpeed);
+
             
-        //}
-        /*else if(!_isScaling)
-        {
-            transform.DOScale(Vector3.one, 1f);
-
-        }*/
-
-
-
+        }
     }
 
     private void CreateAudioBands()
@@ -194,7 +188,7 @@ public class MusicEffectOnPlayer : MonoBehaviour
     {
         for(int g = 0; g < 8; ++g)
         {
-            if (freqband[g] > bandBuffer[g] && Mathf.Abs(freqband[g] - bandBuffer[g]) > 1f) {
+            if (freqband[g] > bandBuffer[g] && Mathf.Abs(freqband[g] - bandBuffer[g]) > _minDiff) {
                 bandBuffer[g] = freqband[g];
                 decrease[g] = 0.0005f;
                 

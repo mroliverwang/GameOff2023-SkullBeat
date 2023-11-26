@@ -1119,6 +1119,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _speed: 5
   _jumpPower: 8
+  initialSpeed: 0
+  initialJumpPower: 0
 --- !u!70 &689463960
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -1499,7 +1501,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 24300002, guid: 273faedf88560624ebc3442f184cc762, type: 2}
-  m_audioClip: {fileID: 8300000, guid: dbc1f6a271d5975499ca122738004181, type: 3}
+  m_audioClip: {fileID: 8300000, guid: f584a508c8cdcff4080e6e89e44599ce, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.52
   m_Pitch: 1
