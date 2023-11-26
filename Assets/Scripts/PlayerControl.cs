@@ -92,6 +92,9 @@ public class PlayerControl : MonoBehaviour
 
     void FixedUpdate()
     {
+        GetComponent<Animator>().SetBool("walk", false);
+
+
 
         //player movement (normal)
         if (_isMoving && !_isOnSlippery && !_isOnBelt)
@@ -99,6 +102,19 @@ public class PlayerControl : MonoBehaviour
             var velocityX = _speed * horizontal;
             _rb.velocity = new Vector2(velocityX, _rb.velocity.y);
             _isMoving = false;
+            
+
+            if (horizontal > 0)
+            {
+                GetComponent<SpriteRenderer>().flipX = false;
+                GetComponent<Animator>().SetBool("walk", true);
+            }
+            if ( horizontal < 0)
+            {
+                GetComponent<SpriteRenderer>().flipX = true;
+                GetComponent<Animator>().SetBool("walk", true);
+            }
+
         }
 
 
@@ -108,6 +124,18 @@ public class PlayerControl : MonoBehaviour
             var velocityX = _speed/4 * horizontal;
             _rb.velocity = new Vector2(_rb.velocity.x + velocityX, _rb.velocity.y);
             _isMoving = false;
+            GetComponent<Animator>().SetBool("walk", true);
+
+            if (horizontal > 0)
+            {
+                GetComponent<SpriteRenderer>().flipX = false;
+                GetComponent<Animator>().SetBool("walk", true);
+            }
+            if (horizontal < 0)
+            {
+                GetComponent<SpriteRenderer>().flipX = true;
+                GetComponent<Animator>().SetBool("walk", true);
+            }
         }
 
 
@@ -115,6 +143,7 @@ public class PlayerControl : MonoBehaviour
         //jump
         if (_playerInput.Player.Jump.triggered && _doubleJump > 0)
         {
+            GetComponent<Animator>().SetBool("jump", true);
             var vertical = Mathf.RoundToInt(_playerInput.Player.Jump.ReadValue<float>());
             var velocityY = _jumpPower * vertical;
             _rb.velocity = new Vector2(_rb.velocity.x, velocityY);
@@ -173,7 +202,8 @@ public class PlayerControl : MonoBehaviour
         {
             _doubleJump = 2;
 
-            
+            GetComponent<Animator>().SetBool("jump", false);
+
             if (_fallingSpeed < _fallDamage)
             {
                 //lose earphones

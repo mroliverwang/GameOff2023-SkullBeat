@@ -45,8 +45,8 @@ public class MusicEffectOnPlayer : MonoBehaviour
 
     void Awake()
     {
-        _maxSize = 3.4f;
-        _minSize = 1f;
+        _maxSize = 1.2f;
+        _minSize = 0.5f;
         updateTime = 0.1f;
 
 
@@ -109,8 +109,8 @@ public class MusicEffectOnPlayer : MonoBehaviour
 
 
 
-            transform.DOScale(new Vector3(Mathf.Min(audiobandbuffer[_freqChannel] * 3.5f + 1f, _maxSize),
-               Mathf.Min(audiobandbuffer[_freqChannel] * 4f + 1f, _maxSize), transform.localScale.z), 0.2f);
+            transform.DOScale(new Vector3(Mathf.Min(audiobandbuffer[_freqChannel] * 3.5f + 0.5f, _maxSize),
+               Mathf.Min(audiobandbuffer[_freqChannel] * 4f + 0.5f, _maxSize), transform.localScale.z), 0.2f);
 
             //change mass, speed, jumpPower
             _rb.mass = 1 * transform.localScale.x;
