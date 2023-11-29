@@ -6,21 +6,26 @@ using UnityEngine.SceneManagement;
 public class PlayerControl : MonoBehaviour
 {
     protected Rigidbody2D _rb;
-    private PlayerInput _playerInput;
+    public PlayerInput _playerInput;
 
     private float _fallingSpeed;
     private float _fallDamage;
     public float _rayCastDistance;
     public float _rayCastDownDistance;
 
+    public AudioSource audioSource;
 
+    public GameObject earphone;
+
+    [SerializeField]
     private bool _isMoving;
+    [SerializeField]
     private bool _isOnSlippery;
     private bool _isOnBelt;
     private int _doubleJump;
     private Vector2 _initialPosition;
 
-
+    public bool isOnHeadPhone;
 
 
     [SerializeField]
@@ -60,6 +65,12 @@ public class PlayerControl : MonoBehaviour
 
         _playerInput = new PlayerInput();
         _rb = GetComponent<Rigidbody2D>();
+
+        isOnHeadPhone = false;
+
+        audioSource.volume = 0.3f;
+
+        GetComponent<MusicEffectOnPlayer>().isActive = false;
     }
 
 
@@ -86,7 +97,15 @@ public class PlayerControl : MonoBehaviour
         }
 
 
-
+        if (isOnHeadPhone)
+        {
+            if (!earphone.activeSelf)
+            {
+                earphone.SetActive(true);
+                //audioSource.Play();
+                audioSource.volume = 0.8f;
+            }
+        }
 
     }
 
@@ -107,11 +126,15 @@ public class PlayerControl : MonoBehaviour
             if (horizontal > 0)
             {
                 GetComponent<SpriteRenderer>().flipX = false;
+                earphone.GetComponent<SpriteRenderer>().flipX = false;
+                earphone.transform.localPosition = new Vector3(-0.51f, earphone.transform.localPosition.y, earphone.transform.localPosition.z);
                 GetComponent<Animator>().SetBool("walk", true);
             }
             if ( horizontal < 0)
             {
                 GetComponent<SpriteRenderer>().flipX = true;
+                earphone.GetComponent<SpriteRenderer>().flipX = true;
+                earphone.transform.localPosition = new Vector3(0.53f, earphone.transform.localPosition.y, earphone.transform.localPosition.z);
                 GetComponent<Animator>().SetBool("walk", true);
             }
 
@@ -129,11 +152,13 @@ public class PlayerControl : MonoBehaviour
             if (horizontal > 0)
             {
                 GetComponent<SpriteRenderer>().flipX = false;
+                earphone.GetComponent<SpriteRenderer>().flipX = false;
                 GetComponent<Animator>().SetBool("walk", true);
             }
             if (horizontal < 0)
             {
                 GetComponent<SpriteRenderer>().flipX = true;
+                earphone.GetComponent<SpriteRenderer>().flipX = true;
                 GetComponent<Animator>().SetBool("walk", true);
             }
         }
@@ -178,13 +203,13 @@ public class PlayerControl : MonoBehaviour
         
         if (horizontal != 0)
         {
-            RaycastHit2D hit = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y - 0.5f),
+            RaycastHit2D hit = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y - 0.2f),
                     new Vector2(horizontal, 0), _rayCastDistance, LayerMask.GetMask("Obstacle"));
-            RaycastHit2D hit2 = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y - 0.5f),
+            RaycastHit2D hit2 = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y - 0.2f),
                     new Vector2(horizontal, 0), _rayCastDistance, LayerMask.GetMask("Ground"));
 
-            /*Debug.DrawRay(new Vector2(transform.position.x, transform.position.y - 0.5f),
-                    new Vector2(horizontal, 0), Color.black);*/
+            Debug.DrawLine(new Vector2(transform.position.x, transform.position.y - 0.2f),
+                    new Vector2(transform.position.x, transform.position.y - 0.2f) + new Vector2(horizontal * _rayCastDistance, 0), Color.black);
             
             if (hit.transform != null || hit2.transform != null)
             {
@@ -208,6 +233,9 @@ public class PlayerControl : MonoBehaviour
             {
                 //lose earphones
                 Debug.Log("EARPHONE DROPS");
+                audioSource.volume = 0.25f;
+                earphone.GetComponent<Earphone>().fly();
+                GetComponent<MusicEffectOnPlayer>().isActive = false;
                 _fallingSpeed = 0;
             }
         }
@@ -220,6 +248,9 @@ public class PlayerControl : MonoBehaviour
             {
                 //lose earphones
                 Debug.Log("EARPHONE DROPS");
+                audioSource.volume = 0.25f;
+                earphone.GetComponent<Earphone>().fly();
+                GetComponent<MusicEffectOnPlayer>().isActive = false;
                 _fallingSpeed = 0;
             }
         }
@@ -232,6 +263,9 @@ public class PlayerControl : MonoBehaviour
             {
                 //lose earphones
                 Debug.Log("EARPHONE DROPS");
+                audioSource.volume = 0.25f;
+                earphone.GetComponent<Earphone>().fly();
+                GetComponent<MusicEffectOnPlayer>().isActive = false;
                 _fallingSpeed = 0;
             }
         }

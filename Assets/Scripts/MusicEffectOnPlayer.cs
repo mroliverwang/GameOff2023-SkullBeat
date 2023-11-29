@@ -8,9 +8,9 @@ public class MusicEffectOnPlayer : MonoBehaviour
 {
     public AudioSource audioSource;
     private float[] clipSamples;
-    private float[] freqband;
-    private float[] bandBuffer;
-    private float[] decrease;
+    public float[] freqband;
+    public float[] bandBuffer;
+    public float[] decrease;
 
     public float[] freqbandHigh;
     public float[] audioband;
@@ -44,6 +44,8 @@ public class MusicEffectOnPlayer : MonoBehaviour
 
     private Rigidbody2D _rb;
 
+    public bool isActive;
+
     void Awake()
     {
         _maxSize = 1.2f;
@@ -56,7 +58,9 @@ public class MusicEffectOnPlayer : MonoBehaviour
         clipSamples = new float[arraySize];
         freqband = new float[8];
         bandBuffer = new float[8];
-        decrease = new float[8];
+        decrease = new float[8]{
+            0.005f,0.005f,0.005f,0.005f,0.005f,0.005f,0.005f,0.005f,
+        };
         freqbandHigh = new float[8];
         audioband = new float[8];
         audiobandbuffer = new float[8];
@@ -71,12 +75,12 @@ public class MusicEffectOnPlayer : MonoBehaviour
         switch (SceneManager.GetActiveScene().name)
         {
             case "Level1":
-                _freqChannel = 1;
+                _freqChannel = 0;
                 _minDiff = 0.8f;
                 break;
 
             case "Level2":
-                _freqChannel = 1;
+                _freqChannel = 0;
                 _minDiff = 0.8f;
                 break;
 
@@ -102,9 +106,11 @@ public class MusicEffectOnPlayer : MonoBehaviour
         _minSpeed = 6f;
 
         _rb = GetComponent<Rigidbody2D>();
+
+        isActive = false;
     }
 
-    void FixedUpdate()
+    void Update()
     {
         //if( _isScaling &&  _ableToScale)
         //{
@@ -131,7 +137,7 @@ public class MusicEffectOnPlayer : MonoBehaviour
                 });
             });*/
 
-        if (audioSource.isPlaying) {
+        if (audioSource.isPlaying && isActive) {
 
 
             GetMusicData();
@@ -141,8 +147,8 @@ public class MusicEffectOnPlayer : MonoBehaviour
 
 
 
-            transform.DOScale(new Vector3(Mathf.Min(audiobandbuffer[_freqChannel] * 3.5f + 0.5f, _maxSize),
-               Mathf.Min(audiobandbuffer[_freqChannel] * 4f + 0.5f, _maxSize), transform.localScale.z), 0.2f);
+            transform.DOScale(new Vector3(Mathf.Max(Mathf.Min(audiobandbuffer[_freqChannel] * 3.5f + 0.5f, _maxSize), 0.5f),
+               Mathf.Max(Mathf.Min(audiobandbuffer[_freqChannel] * 4f + 0.5f, _maxSize), 0.5f), transform.localScale.z), 0.2f);
 
             //change mass, speed, jumpPower
             _rb.mass = 1 * transform.localScale.x;
@@ -151,20 +157,20 @@ public class MusicEffectOnPlayer : MonoBehaviour
                 _maxJump);
 
 
-            GetComponent<PlayerControl>()._speed = Mathf.Max(GetComponent<PlayerControl>().initialSpeed * (1 - audiobandbuffer[_freqChannel] * 3.5f ),
+            GetComponent<PlayerControl>()._speed = Mathf.Max(GetComponent<PlayerControl>().initialSpeed * (1.2f - audiobandbuffer[_freqChannel] * 3.5f ),
                 _minSpeed);
 
             GetComponent<PlayerControl>()._rayCastDistance = Mathf.Min(GetComponent<PlayerControl>().initialSpeed * (1 + audiobandbuffer[_freqChannel] * 3.5f),
-                7f);
+                2f);
 
             GetComponent<PlayerControl>()._rayCastDownDistance = Mathf.Min(GetComponent<PlayerControl>().initialSpeed * (1 + audiobandbuffer[_freqChannel] * 3.5f),
-                5f);
+                3f);
         }
     }
 
     private void CreateAudioBands()
     {
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 4; i++)
         {
             if(freqband [i] > freqbandHigh[i])
             {
@@ -199,7 +205,7 @@ public class MusicEffectOnPlayer : MonoBehaviour
     {
         int count = 0;
 
-        for(int i = 0; i<8; i++)
+        for(int i = 0; i<4; i++)
         {
             float average = 0;
             int sampleCount = (int)Mathf.Pow(2, i) * 2;
@@ -222,20 +228,22 @@ public class MusicEffectOnPlayer : MonoBehaviour
 
     private void BandBuffer()
     {
-        for(int g = 0; g < 8; ++g)
+        for(int g = 0; g < 4; ++g)
         {
-            if (freqband[g] > bandBuffer[g] && Mathf.Abs(freqband[g] - bandBuffer[g]) > _minDiff) {
+            //if (freqband[g] > bandBuffer[g] && Mathf.Abs(freqband[g] - bandBuffer[g]) > _minDiff) {
+            if (freqband[g] > bandBuffer[g] && Mathf.Abs(freqband[g] - bandBuffer[g]) > _minDiff && bandBuffer[g]<=0)
+            {
                 bandBuffer[g] = freqband[g];
-                decrease[g] = 0.0003f;
+                decrease[g] = 0.002f;
                 
             }
             else
             {
-                if (bandBuffer[g] - decrease[g] > 0)
+                if (bandBuffer[g] - decrease[g] > -3f)
                 {
                     bandBuffer[g] -= decrease[g];
 
-                    decrease[g] *= 1.05f;
+                    decrease[g] *= 1.02f;
                 }
                 //bandBuffer[g] = 0;
             }
