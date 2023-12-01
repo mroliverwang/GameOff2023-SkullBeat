@@ -29,6 +29,7 @@ public class GameMenuUI : MonoBehaviour
     public void ButtonRetart()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        Attempts.attempt++;
     }
 
 

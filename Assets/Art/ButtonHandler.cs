@@ -10,6 +10,7 @@ public class ButtonHandler : MonoBehaviour
     public void toGame()
     {
         SceneManager.LoadScene("Level1");
+        Attempts.attempt = 1;
     }
     public void toCredits()
     {

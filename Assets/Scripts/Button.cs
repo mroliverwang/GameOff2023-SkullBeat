@@ -1,11 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class Button : MonoBehaviour
 {
 
     public GameObject door;
+
+    private float y;
+
+    private void Awake()
+    {
+        y = transform.localPosition.y - 0.3f;
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -20,6 +28,7 @@ public class Button : MonoBehaviour
                 if (door != null)
                 {
                     door.GetComponent<Door>().DoorOpen();
+                    transform.DOLocalMoveY(y, 0.4f);
                 }
             }
             else
@@ -32,6 +41,7 @@ public class Button : MonoBehaviour
                     if (door != null)
                     {
                         door.GetComponent<Door>().DoorOpen();
+                        transform.DOLocalMoveY(y, 0.4f);
                     }
                 }
 

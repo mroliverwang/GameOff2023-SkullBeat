@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1245121883}
   - component: {fileID: 1245121882}
   - component: {fileID: 1245121884}
+  - component: {fileID: 23746336}
   m_Layer: 0
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -185,6 +186,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5378e8bf03108314f86809d14ee44d08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!95 &23746336
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1245121880}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: ace071e99fbb3834587ded5dcb2e5256, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
 --- !u!1 &2976699840716642295
 GameObject:
   m_ObjectHideFlags: 0
@@ -196,6 +217,7 @@ GameObject:
   - component: {fileID: 2976699840716642290}
   - component: {fileID: 2976699840716642289}
   - component: {fileID: 2976699840716642288}
+  - component: {fileID: 2976699839207342774}
   m_Layer: 0
   m_Name: Attempts
   m_TagString: Untagged
@@ -358,3 +380,23 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 2976699840716642289}
   m_maskType: 0
+--- !u!95 &2976699839207342774
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2976699840716642295}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 4c2d0136bb63776478b6b91c147a0121, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
