@@ -24,6 +24,6 @@ public class Door : MonoBehaviour
 
     public void DoorClose()
     {
-        transform.DOMoveY(-15.0f, 2.0f);
+        transform.DOMoveY(15.0f, 2.0f);
     }
 }

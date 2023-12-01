@@ -38,26 +38,26 @@ public class PlayerControl : MonoBehaviour
 
     private int horizontal;
 
-
+    public GameObject gameMenu;
 
     private void Awake()
     {
         Application.targetFrameRate = 75;
 
         _doubleJump = 2;
-        _speed = 11f;       
+        _speed = 11f;
         _jumpPower = 24f;
         initialSpeed = _speed;
         initialJumpPower = _jumpPower;
 
 
         _initialPosition = new Vector2(-6f, 1f);
-        horizontal= 0;
+        horizontal = 0;
 
         _rayCastDistance = 1.5f;
         _rayCastDownDistance = 1.5f;
         _fallingSpeed = 0;
-        _fallDamage = -40f;
+        _fallDamage = -50f;
 
         _isMoving = false;
         _isOnSlippery = false;
@@ -71,14 +71,21 @@ public class PlayerControl : MonoBehaviour
         audioSource.volume = 0.3f;
 
         GetComponent<MusicEffectOnPlayer>().isActive = false;
+
+        //gameMenu = GameObject.Find("CanvasGameMenu");
     }
 
 
     private void Update()
     {
-        if(_rb.velocity.y < _fallingSpeed)
+        if (_rb.velocity.y < _fallingSpeed)
         {
             _fallingSpeed = _rb.velocity.y;
+        }
+
+        if (_fallingSpeed < -100)
+        {
+            PlayerDead();
         }
 
 
@@ -90,10 +97,21 @@ public class PlayerControl : MonoBehaviour
 
         }
 
+        if (_playerInput.Player.ESCMenu.triggered)
+        {
+            gameMenu.SetActive(true);
+            _rb.constraints = RigidbodyConstraints2D.FreezeAll;
+        }
+
+
 
         if (_playerInput.Player.Restart.triggered)
         {
-            RestartLevel();
+            if (!gameMenu.activeSelf)
+            {
+                PlayerDead();
+            }
+
         }
 
 
@@ -121,20 +139,20 @@ public class PlayerControl : MonoBehaviour
             var velocityX = _speed * horizontal;
             _rb.velocity = new Vector2(velocityX, _rb.velocity.y);
             _isMoving = false;
-            
+
 
             if (horizontal > 0)
             {
                 GetComponent<SpriteRenderer>().flipX = false;
                 earphone.GetComponent<SpriteRenderer>().flipX = false;
-                earphone.transform.localPosition = new Vector3(-0.51f, earphone.transform.localPosition.y, earphone.transform.localPosition.z);
+                earphone.transform.localPosition = new Vector3(-0.83f, earphone.transform.localPosition.y, earphone.transform.localPosition.z);
                 GetComponent<Animator>().SetBool("walk", true);
             }
-            if ( horizontal < 0)
+            if (horizontal < 0)
             {
                 GetComponent<SpriteRenderer>().flipX = true;
                 earphone.GetComponent<SpriteRenderer>().flipX = true;
-                earphone.transform.localPosition = new Vector3(0.53f, earphone.transform.localPosition.y, earphone.transform.localPosition.z);
+                earphone.transform.localPosition = new Vector3(0.83f, earphone.transform.localPosition.y, earphone.transform.localPosition.z);
                 GetComponent<Animator>().SetBool("walk", true);
             }
 
@@ -144,7 +162,7 @@ public class PlayerControl : MonoBehaviour
         //moving on special surface
         if (_isMoving && (_isOnSlippery || _isOnBelt))
         {
-            var velocityX = _speed/4 * horizontal;
+            var velocityX = _speed / 4 * horizontal;
             _rb.velocity = new Vector2(_rb.velocity.x + velocityX, _rb.velocity.y);
             _isMoving = false;
             GetComponent<Animator>().SetBool("walk", true);
@@ -181,8 +199,11 @@ public class PlayerControl : MonoBehaviour
     {
         //ResetLevel();
         //animation
+        GetComponent<Animator>().SetBool("death", true);
+        _rb.constraints = RigidbodyConstraints2D.FreezeAll;
+
         //transform.position = _initialPosition;
-        RestartLevel();
+        //RestartLevel();
     }
 
 
@@ -200,7 +221,7 @@ public class PlayerControl : MonoBehaviour
 
     private bool IsOnWall(int horizontal)
     {
-        
+
         if (horizontal != 0)
         {
             RaycastHit2D hit = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y - 0.2f),
@@ -210,7 +231,7 @@ public class PlayerControl : MonoBehaviour
 
             Debug.DrawLine(new Vector2(transform.position.x, transform.position.y - 0.2f),
                     new Vector2(transform.position.x, transform.position.y - 0.2f) + new Vector2(horizontal * _rayCastDistance, 0), Color.black);
-            
+
             if (hit.transform != null || hit2.transform != null)
             {
                 return true;
@@ -222,7 +243,7 @@ public class PlayerControl : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(Physics2D.Raycast(transform.position, Vector2.down, _rayCastDownDistance,
+        if (Physics2D.Raycast(transform.position, Vector2.down, _rayCastDownDistance,
                     LayerMask.GetMask("Ground")).transform != null)
         {
             _doubleJump = 2;
@@ -240,7 +261,7 @@ public class PlayerControl : MonoBehaviour
             }
         }
 
-        if(collision.gameObject.tag == "Slippery")
+        if (collision.gameObject.tag == "Slippery")
         {
             _isOnSlippery = true;
 
@@ -290,6 +311,16 @@ public class PlayerControl : MonoBehaviour
     public void RestartLevel()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Attempts.attempt++;
     }
 
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if (Physics2D.Raycast(transform.position, Vector2.down, _rayCastDownDistance,
+                    LayerMask.GetMask("Ground")).transform != null)
+        {
+            //_doubleJump = 2;
+        }
+    }
 }

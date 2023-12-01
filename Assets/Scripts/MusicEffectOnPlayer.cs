@@ -23,7 +23,7 @@ public class MusicEffectOnPlayer : MonoBehaviour
     public float dbValue;    // sound level - dB
     public float volume; // set how much the scale will vary
 
-    public float updateTime;
+    public float coolDown;
 
     private float _maxSize;
     private float _minSize;
@@ -46,11 +46,17 @@ public class MusicEffectOnPlayer : MonoBehaviour
 
     public bool isActive;
 
+    public bool big;
+
+    public bool firstBeatCame;
+
+    public float distanceFactor;
+
     void Awake()
     {
         _maxSize = 1.2f;
         _minSize = 0.5f;
-        updateTime = 0.1f;
+        
 
 
         _initialScale = transform.localScale;
@@ -76,12 +82,12 @@ public class MusicEffectOnPlayer : MonoBehaviour
         {
             case "Level1":
                 _freqChannel = 0;
-                _minDiff = 0.8f;
+                _minDiff = 1.2f;
                 break;
 
             case "Level2":
                 _freqChannel = 0;
-                _minDiff = 0.8f;
+                _minDiff = 1.2f;
                 break;
 
             case "Level3":
@@ -108,6 +114,12 @@ public class MusicEffectOnPlayer : MonoBehaviour
         _rb = GetComponent<Rigidbody2D>();
 
         isActive = false;
+
+        coolDown = 0f;
+        big = true;
+        firstBeatCame = false;
+
+        distanceFactor = 1f;
     }
 
     void Update()
@@ -137,7 +149,11 @@ public class MusicEffectOnPlayer : MonoBehaviour
                 });
             });*/
 
-        if (audioSource.isPlaying && isActive) {
+        coolDown -= Time.deltaTime;
+
+
+        /*if (audioSource.isPlaying && isActive)
+        {
 
 
             GetMusicData();
@@ -153,18 +169,92 @@ public class MusicEffectOnPlayer : MonoBehaviour
             //change mass, speed, jumpPower
             _rb.mass = 1 * transform.localScale.x;
 
-            GetComponent<PlayerControl>()._jumpPower = Mathf.Min(GetComponent<PlayerControl>().initialJumpPower * (1 + audiobandbuffer[_freqChannel] * 3.5f ),
+            GetComponent<PlayerControl>()._jumpPower = Mathf.Min(GetComponent<PlayerControl>().initialJumpPower * (1 + audiobandbuffer[_freqChannel] * 3.5f),
                 _maxJump);
 
 
-            GetComponent<PlayerControl>()._speed = Mathf.Max(GetComponent<PlayerControl>().initialSpeed * (1.2f - audiobandbuffer[_freqChannel] * 3.5f ),
+            GetComponent<PlayerControl>()._speed = Mathf.Max(GetComponent<PlayerControl>().initialSpeed * (1.2f - audiobandbuffer[_freqChannel] * 3.5f),
                 _minSpeed);
 
-            GetComponent<PlayerControl>()._rayCastDistance = Mathf.Min(GetComponent<PlayerControl>().initialSpeed * (1 + audiobandbuffer[_freqChannel] * 3.5f),
+            GetComponent<PlayerControl>()._rayCastDistance = Mathf.Min(GetComponent<PlayerControl>()._rayCastDistance * (1 + audiobandbuffer[_freqChannel] * 3.5f),
                 2f);
 
-            GetComponent<PlayerControl>()._rayCastDownDistance = Mathf.Min(GetComponent<PlayerControl>().initialSpeed * (1 + audiobandbuffer[_freqChannel] * 3.5f),
+            GetComponent<PlayerControl>()._rayCastDownDistance = Mathf.Min(GetComponent<PlayerControl>()._rayCastDownDistance * (1 + audiobandbuffer[_freqChannel] * 3.5f),
                 3f);
+        }*/
+
+
+
+        if (audioSource.isPlaying && isActive)
+        {
+
+            GetMusicData();
+            MakeFrequencyBands();
+            BandBuffer();
+            CreateAudioBands();
+
+            if (firstBeatCame)
+            {
+                if (coolDown <= 0)
+                {
+                    if (big)
+                    {
+                        transform.DOScale(new Vector3(Mathf.Max(_maxSize * distanceFactor, 0.7f),
+                           Mathf.Max(_maxSize * distanceFactor, 0.7f), transform.localScale.z), 0.2f).OnComplete(() =>
+                           {
+                               big = false;
+
+                           }).OnUpdate(()=>
+                           {
+                               //change mass, speed, jumpPower
+                               _rb.mass = 1 * transform.localScale.x;
+
+                               GetComponent<PlayerControl>()._jumpPower = Mathf.Min(GetComponent<PlayerControl>().initialJumpPower * (0.5f + transform.localScale.x),
+                                   _maxJump);
+
+
+                               GetComponent<PlayerControl>()._speed = Mathf.Max(GetComponent<PlayerControl>().initialSpeed * (1.5f - transform.localScale.x),
+                                   _minSpeed);
+
+                               GetComponent<PlayerControl>()._rayCastDistance = Mathf.Min(GetComponent<PlayerControl>()._rayCastDistance * (0.5f + transform.localScale.x),
+                                   2.8f);
+
+                               GetComponent<PlayerControl>()._rayCastDownDistance = Mathf.Min(GetComponent<PlayerControl>()._rayCastDownDistance * (0.5f + transform.localScale.x),
+                                   3f);
+                           });
+                    }
+                    else
+                    {
+                        transform.DOScale(new Vector3(0.5f,
+                           0.5f, transform.localScale.z), 0.4f).OnComplete(() =>
+                           {
+                               big = true;
+
+                           }).OnUpdate(()=>
+                           {
+                               //change mass, speed, jumpPower
+                               _rb.mass = 1 * transform.localScale.x;
+
+                               GetComponent<PlayerControl>()._jumpPower = Mathf.Min(GetComponent<PlayerControl>().initialJumpPower * (0.5f + transform.localScale.x),
+                                   _maxJump);
+
+
+                               GetComponent<PlayerControl>()._speed = Mathf.Max(GetComponent<PlayerControl>().initialSpeed * (1.5f - transform.localScale.x),
+                                   _minSpeed);
+
+                               GetComponent<PlayerControl>()._rayCastDistance = Mathf.Min(GetComponent<PlayerControl>()._rayCastDistance * (0.5f + transform.localScale.x),
+                                   1.5f);
+
+                               GetComponent<PlayerControl>()._rayCastDownDistance = Mathf.Min(GetComponent<PlayerControl>()._rayCastDownDistance * (0.5f + transform.localScale.x),
+                                   3f);
+                           });
+                    }
+
+                    
+
+                    coolDown = 2;
+                }
+            }
         }
     }
 
@@ -235,6 +325,8 @@ public class MusicEffectOnPlayer : MonoBehaviour
             {
                 bandBuffer[g] = freqband[g];
                 decrease[g] = 0.002f;
+
+                firstBeatCame = true;
                 
             }
             else

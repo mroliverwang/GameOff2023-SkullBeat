@@ -6,7 +6,28 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/OnboardScene.unity
+    guid: 5f96a5298b3a8e346aba8f1e54a38ef9
+  - enabled: 1
+    path: Assets/Scenes/StartScene.unity
+    guid: 2e7fc83450ffc2442be4edda65290870
+  - enabled: 1
+    path: Assets/Scenes/Instruction.unity
+    guid: 8708527ace5b21947b3c6f28487f1b62
+  - enabled: 1
+    path: Assets/Scenes/Credits.unity
+    guid: 52a14aa57e757d1438bcceee3ea7a9b4
+  - enabled: 1
+    path: Assets/Scenes/WinGameScene.unity
+    guid: fa95a927a42efd34b951384a1c78a20f
+  - enabled: 1
     path: Assets/Scenes/Level1.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/Level2.unity
+    guid: 8f06b76c401cb4f4e883cfb6111ba349
+  - enabled: 1
+    path: Assets/Scenes/Level3.unity
+    guid: 3feed29c4f602c143baeb89643bc09b0
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 4bc52a3d50ff7dc46aa70bb56492549c, type: 2}

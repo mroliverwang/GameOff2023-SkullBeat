@@ -80,6 +80,15 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ESCMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""85822acc-f8f5-4156-8064-48849f0eb63f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -333,6 +342,17 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0508cef7-df16-4e6a-b9fe-caa82d7a18f9"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ESCMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -926,6 +946,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Restart = m_Player.FindAction("Restart", throwIfNotFound: true);
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
+        m_Player_ESCMenu = m_Player.FindAction("ESCMenu", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1003,6 +1024,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Restart;
     private readonly InputAction m_Player_Interact;
+    private readonly InputAction m_Player_ESCMenu;
     public struct PlayerActions
     {
         private @PlayerInput m_Wrapper;
@@ -1013,6 +1035,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @Restart => m_Wrapper.m_Player_Restart;
         public InputAction @Interact => m_Wrapper.m_Player_Interact;
+        public InputAction @ESCMenu => m_Wrapper.m_Player_ESCMenu;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1040,6 +1063,9 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 @Interact.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnInteract;
                 @Interact.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnInteract;
                 @Interact.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnInteract;
+                @ESCMenu.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnESCMenu;
+                @ESCMenu.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnESCMenu;
+                @ESCMenu.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnESCMenu;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -1062,6 +1088,9 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 @Interact.started += instance.OnInteract;
                 @Interact.performed += instance.OnInteract;
                 @Interact.canceled += instance.OnInteract;
+                @ESCMenu.started += instance.OnESCMenu;
+                @ESCMenu.performed += instance.OnESCMenu;
+                @ESCMenu.canceled += instance.OnESCMenu;
             }
         }
     }
@@ -1224,6 +1253,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnRestart(InputAction.CallbackContext context);
         void OnInteract(InputAction.CallbackContext context);
+        void OnESCMenu(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
